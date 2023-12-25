@@ -78,6 +78,12 @@ export default function PostTweetFrom() {
     const user = auth.currentUser;
     if (!user || isLoading || tweet === "" || tweet.length > 180) return;
 
+    if (file && file?.size > 1000000) {
+      alert(`File size limit is 1MB. Now is ${file?.size / 1000000}MB`);
+      setFile(null);
+      return;
+    }
+
     try {
       setLoading(true);
       const doc = await addDoc(collection(db, "tweets"), {
