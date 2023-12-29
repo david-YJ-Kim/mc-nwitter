@@ -14,11 +14,7 @@ import {
 } from "firebase/firestore";
 import { ITweet } from "../components/timeline";
 import Tweet from "../components/tweets";
-import {
-  CancelButton,
-  EditButton,
-  SaveButton,
-} from "../components/button-components";
+import { CancelButton, SaveButton } from "../components/button-components";
 
 const Wrapper = styled.div`
   display: flex;
@@ -121,7 +117,7 @@ export default function Profile() {
     setUserName(e.target.value);
   };
 
-  const onEditSave = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onEditSave = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     if (!user) return;
     await updateProfile(user, {
@@ -136,7 +132,7 @@ export default function Profile() {
     setProfileEditmode(false);
   };
 
-  const onEditBtnClick = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onEditBtnClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setProfileEditmode(true);
   };

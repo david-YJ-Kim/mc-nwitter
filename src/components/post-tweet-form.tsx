@@ -3,7 +3,7 @@ import { useState } from "react";
 import { styled } from "styled-components";
 import { auth, db, storage } from "../firebase";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { LargeTextArea, TextArea } from "./textarea-components";
+import { TextArea } from "./textarea-components";
 
 const Form = styled.form`
   display: flex;

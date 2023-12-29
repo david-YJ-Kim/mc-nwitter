@@ -1,17 +1,22 @@
+// Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 // import { getAnalytics } from "firebase/analytics";
 import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
+import { getFirestore } from "firebase/firestore";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
 
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyCiBur5eJl8QX3xu_dBRKO0dSMjKqpUOOA",
-  authDomain: "sellter-e5dc9.firebaseapp.com",
-  projectId: "sellter-e5dc9",
-  storageBucket: "sellter-e5dc9.appspot.com",
-  messagingSenderId: "484362266395",
-  appId: "1:484362266395:web:7475c2f13d8d5af0da95be",
-  measurementId: "G-03127VT72S",
+  apiKey: "AIzaSyB8rllHl2W4KW7QaPHX4bvbZfGQHHJ1gMk",
+  authDomain: "nc-nwitter.firebaseapp.com",
+  projectId: "nc-nwitter",
+  storageBucket: "nc-nwitter.appspot.com",
+  messagingSenderId: "482509308778",
+  appId: "1:482509308778:web:90edcf8992f34a25331b13",
+  measurementId: "G-D9188JQP4K",
 };
 
 // Initialize Firebase
