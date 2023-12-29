@@ -9,10 +9,16 @@ import {
   limit,
   orderBy,
   query,
+  updateDoc,
   where,
 } from "firebase/firestore";
 import { ITweet } from "../components/timeline";
 import Tweet from "../components/tweets";
+import {
+  CancelButton,
+  EditButton,
+  SaveButton,
+} from "../components/button-components";
 
 const Wrapper = styled.div`
   display: flex;
@@ -51,10 +57,26 @@ const Tweets = styled.div`
   gap: 10px;
 `;
 
+const Column = styled.div``;
+
+const Form = styled.form``;
+
+const NameInput = styled.input``;
+
+const EditClickSpan = styled.span`
+  cursor: pointer;
+  svg {
+    width: 20px;
+  }
+`;
+
 export default function Profile() {
   const user = auth.currentUser;
   const [avatar, setAvatar] = useState(user?.photoURL);
   const [tweets, setTweets] = useState<ITweet[]>([]);
+  const [userName, setUserName] = useState(user?.displayName);
+  const [profileEditmode, setProfileEditmode] = useState(false);
+
   const onAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = e.target;
     if (!user) return;
@@ -70,15 +92,18 @@ export default function Profile() {
     }
   };
 
-  const fetchTweets = async () => {
+  const getMyTweetsSnapshot = async () => {
     const tweetQuery = query(
       collection(db, "tweets"),
       where("userId", "==", user?.uid),
       orderBy("createAt", "desc"),
       limit(25)
     );
-    const snapshot = await getDocs(tweetQuery);
-    const tweets = snapshot.docs.map((doc) => {
+    return await getDocs(tweetQuery);
+  };
+
+  const fetchTweets = async () => {
+    const tweets = (await getMyTweetsSnapshot()).docs.map((doc) => {
       const { tweet, createAt, photo, username, userId } = doc.data();
       return {
         tweet,
@@ -91,9 +116,45 @@ export default function Profile() {
     });
     setTweets(tweets);
   };
+
+  const onProfileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setUserName(e.target.value);
+  };
+
+  const onEditSave = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    if (!user) return;
+    await updateProfile(user, {
+      displayName: userName,
+    });
+    updateMyTweets();
+    setProfileEditmode(false);
+  };
+
+  const onEditCancle = () => {
+    setUserName(user?.displayName);
+    setProfileEditmode(false);
+  };
+
+  const onEditBtnClick = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    setProfileEditmode(true);
+  };
+
+  const updateMyTweets = async () => {
+    console.log(userName);
+    (await getMyTweetsSnapshot()).docs.map((doc) => {
+      updateDoc(doc.ref, {
+        username: userName,
+      });
+      fetchTweets();
+    });
+  };
+
   useEffect(() => {
     fetchTweets();
   }, []);
+
   return (
     <Wrapper>
       <AvatarUpload htmlFor="avatar">
@@ -120,10 +181,46 @@ export default function Profile() {
         type="file"
         accept="image/*"
       />
-      <Name>
-        {/* {user?.displayName ? user.displayName : "Anonymous"} */}
-        {user?.displayName ?? "Anonymous"}
-      </Name>
+      <Form>
+        {profileEditmode ? null : (
+          <Name>
+            {/* {user?.displayName ? user.displayName : "Anonymous"} */}
+            {userName ?? "Anonymous"}
+          </Name>
+        )}
+
+        {profileEditmode ? (
+          <NameInput
+            onChange={onProfileChange}
+            value={userName ?? "Anonymous"}
+            type="text"
+          />
+        ) : null}
+
+        {profileEditmode ? (
+          <Column>
+            <SaveButton onClick={onEditSave}>Save</SaveButton>
+            <CancelButton onClick={onEditCancle}>Cancle</CancelButton>
+          </Column>
+        ) : (
+          <EditClickSpan onClick={onEditBtnClick}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="w-6 h-6"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125"
+              />
+            </svg>
+          </EditClickSpan>
+        )}
+      </Form>
       <Tweets>
         {tweets.map((tweet) => (
           <Tweet key={tweet.id} {...tweet} />
